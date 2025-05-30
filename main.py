@@ -5,7 +5,7 @@ from tkinter import messagebox, simpledialog
 from tkinter import ttk
 from ttkbootstrap import Style
 
-DATA_FILE = "data.json"
+DATA_FILE = "data/data.json"
 
 class RecipeManagerApp:
     def __init__(self, master):
