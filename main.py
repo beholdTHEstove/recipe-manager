@@ -110,15 +110,30 @@ class RecipeManagerApp:
             recipe_title = item["text"]
             category = item["values"][1]
             recipe = next((r for r in self.data["recipes"]
-                           if r["title"] == recipe_title and r["category"] == category), None)
+                        if r["title"] == recipe_title and r["category"] == category), None)
             if recipe:
-                details = (f"Title: {recipe['title']}\n"
-                           f"Category: {recipe['category']}\n\n"
-                           f"Ingredients:\n{recipe['ingredients']}\n\n"
-                           f"Instructions:\n{recipe['instructions']}")
                 self.recipe_details.config(state=tk.NORMAL)
                 self.recipe_details.delete("1.0", tk.END)
-                self.recipe_details.insert(tk.END, details)
+
+                # Define tags
+                self.recipe_details.tag_configure("bold", font=("Segoe UI", 10, "bold"))
+                self.recipe_details.tag_configure("title", font=("Segoe UI", 10, "bold italic"))
+
+                # Title (bold italic)
+                self.recipe_details.insert(tk.END, f"{recipe['title']}\n\n", "title")
+
+                # Category label (bold)
+                self.recipe_details.insert(tk.END, "Category: ", "bold")
+                self.recipe_details.insert(tk.END, f"{recipe['category']}\n\n")
+
+                # Ingredients label (bold)
+                self.recipe_details.insert(tk.END, "Ingredients:\n", "bold")
+                self.recipe_details.insert(tk.END, f"{recipe['ingredients']}\n\n")
+
+                # Instructions label (bold)
+                self.recipe_details.insert(tk.END, "Instructions:\n", "bold")
+                self.recipe_details.insert(tk.END, f"{recipe['instructions']}")
+
                 self.recipe_details.config(state=tk.DISABLED)
         else:
             self.recipe_details.config(state=tk.NORMAL)

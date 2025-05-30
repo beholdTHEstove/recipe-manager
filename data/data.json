@@ -1,7 +1,8 @@
 {
     "categories": [
-        "Smoker Recipes",
-        "Sous Vide"
+        "Smoker",
+        "Sous Vide",
+        "Family Recipes"
     ],
     "recipes": [
         {
@@ -12,9 +13,15 @@
         },
         {
             "title": "Baby Back Ribs (OG)",
-            "category": "Smoker Recipes",
+            "category": "Smoker",
             "ingredients": "baby back ribs",
             "instructions": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed rhoncus lorem in massa iaculis, ac mattis nunc pharetra. Etiam vel accumsan odio, rhoncus sagittis tellus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Aliquam eget consectetur elit, nec efficitur ligula. Donec accumsan enim lorem, vitae imperdiet lorem cursus id. Aenean malesuada egestas magna, eget elementum ante pellentesque non. Nunc in bibendum mi. In quis est at urna facilisis placerat ac eu ligula. Donec et mauris sit amet elit varius feugiat. In in finibus odio. Maecenas at lectus tellus.\n\nDonec vel dui aliquam, luctus libero a, aliquam neque. Nunc et ante nisl. Sed rutrum lacus sed massa porttitor auctor. Pellentesque tempor eu ante sit amet eleifend. Integer blandit congue leo non hendrerit. In sed nibh nisi. Donec libero lectus, interdum vel tincidunt eu, sollicitudin in orci. In eleifend nisi magna, in viverra enim feugiat eu. Ut quis malesuada tellus. Vestibulum quis mauris congue, feugiat augue sed, mollis nisl. Vivamus tempor fermentum ligula, ut molestie augue mattis at. Phasellus consequat erat quam, quis pretium ipsum malesuada fringilla. Nam aliquet blandit interdum. Proin tincidunt, massa at dictum fringilla, arcu libero porttitor metus, vitae ultricies augue libero id nulla."
+        },
+        {
+            "title": "Great Aunt Philpie's Aiken Cheese",
+            "category": "Family Recipes",
+            "ingredients": "1 tablespoon of whipped butter, 2 cups of grated sharp cheddar cheese, 5oz of grated romano cheese, 1 teaspoon of worcestershire sauce, 1/2 teaspoon paprika, 1/4 teaspoon of garlic powder",
+            "instructions": "combine all ingredients ~ refrigerate ~ Philpie would take an english muffin, split it and toast it just a little bit. Then spread top with mayo and aiken cheese. Broil until bubbling. Rest a minute and enjoy!"
         }
     ]
 }
