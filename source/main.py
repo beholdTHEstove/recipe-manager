@@ -7,6 +7,87 @@ from ttkbootstrap import Style
 
 DATA_FILE = "data/data.json"
 
+class RecipeDialog(tk.Toplevel):
+    def __init__(self, parent, title="", ingredients="", instructions=""):
+        super().__init__(parent)
+        self.title("Add/Edit Recipe")
+        self.geometry("500x600")
+        self.center_to_parent(parent)
+        self.transient(parent)
+        self.grab_set()
+
+        self.result = None
+
+        tk.Label(self, text="Title:").pack(anchor="w", padx=10, pady=(10, 0))
+        self.title_entry = tk.Entry(self)
+        self.title_entry.pack(fill="x", padx=10)
+        self.title_entry.insert(0, title)
+
+        tk.Label(self, text="Ingredients:").pack(anchor="w", padx=10, pady=(10, 0))
+        self.ingredients_text = tk.Text(self, height=10, wrap=tk.WORD)
+        self.ingredients_text.pack(fill="both", expand=True, padx=10)
+        self.ingredients_text.insert("1.0", ingredients)
+
+        tk.Label(self, text="Instructions:").pack(anchor="w", padx=10, pady=(10, 0))
+        self.instructions_text = tk.Text(self, height=10, wrap=tk.WORD)
+        self.instructions_text.pack(fill="both", expand=True, padx=10)
+        self.instructions_text.insert("1.0", instructions)
+
+        button_frame = tk.Frame(self)
+        button_frame.pack(pady=10)
+
+        tk.Button(button_frame, text="Submit", command=self.on_submit).pack(side="left", padx=5)
+        tk.Button(button_frame, text="Cancel", command=self.destroy).pack(side="left", padx=5)
+
+    def center_to_parent(self, parent):
+        self.update_idletasks()
+        parent_x = parent.winfo_rootx()
+        parent_y = parent.winfo_rooty()
+        parent_w = parent.winfo_width()
+        parent_h = parent.winfo_height()
+        w = self.winfo_width()
+        h = self.winfo_height()
+        x = parent_x + (parent_w // 2) - (w // 2)
+        y = parent_y + (parent_h // 2) - (h // 2)
+        self.geometry(f"{w}x{h}+{x}+{y}")
+
+    def on_submit(self):
+        title = self.title_entry.get().strip()
+        ingredients = self.ingredients_text.get("1.0", tk.END).strip()
+        instructions = self.instructions_text.get("1.0", tk.END).strip()
+        if not title:
+            messagebox.showwarning("Missing Title", "Title cannot be empty.", parent=self)
+            return
+        self.result = (title, ingredients, instructions)
+        self.destroy()
+
+class CategoryDialog(simpledialog.Dialog):
+    def __init__(self, parent, title, initialvalue=""):
+        self.initialvalue = initialvalue
+        super().__init__(parent, title)
+
+    def body(self, master):
+        tk.Label(master, text="Category Name:").grid(row=0, column=0, padx=10, pady=10)
+        self.entry = tk.Entry(master)
+        self.entry.grid(row=0, column=1, padx=10, pady=10)
+        self.entry.insert(0, self.initialvalue)
+        return self.entry
+
+    def apply(self):
+        self.result = self.entry.get().strip()
+
+    def center_to_parent(self, parent):
+        self.update_idletasks()
+        parent_x = parent.winfo_rootx()
+        parent_y = parent.winfo_rooty()
+        parent_w = parent.winfo_width()
+        parent_h = parent.winfo_height()
+        w = self.winfo_width()
+        h = self.winfo_height()
+        x = parent_x + (parent_w // 2) - (w // 2)
+        y = parent_y + (parent_h // 2) - (h // 2)
+        self.geometry(f"{w}x{h}+{x}+{y}")
+
 class RecipeManagerApp:
     def __init__(self, master):
         self.master = master
@@ -18,7 +99,7 @@ class RecipeManagerApp:
         try:
             style = Style("flatly")  # or "darkly", "cyborg", etc.
         except tk.TclError:
-            messagebox.showwarning("Theme Warning", "The 'breeze' theme is not available. Falling back to 'clam'.")
+            messagebox.showwarning("Theme Warning", "The selected theme is not available. Falling back to 'clam'.")
             style.theme_use("clam")
 
         style.configure("Treeview", font=("Segoe UI", 10), rowheight=20)
@@ -66,6 +147,14 @@ class RecipeManagerApp:
         self.recipe_details.pack(fill=tk.BOTH, expand=True)
 
         self.populate_tree()
+
+    def on_ok(self):
+        self.result = {
+            "title": self.title_entry.get().strip(),
+            "ingredients": self.ingredients_text.get("1.0", tk.END).strip(),
+            "instructions": self.instructions_text.get("1.0", tk.END).strip()
+        }
+        self.destroy()
 
     def load_data(self):
         if os.path.exists(DATA_FILE):
@@ -230,6 +319,7 @@ class RecipeManagerApp:
         if not item_id:
             messagebox.showwarning("Add Recipe", "Please select a category to add a recipe under.")
             return
+
         item = self.tree.item(item_id)
         if item.get("values", [None])[0] == "recipe":
             parent_id = self.tree.parent(item_id)
@@ -239,23 +329,20 @@ class RecipeManagerApp:
         else:
             messagebox.showwarning("Add Recipe", "Please select a category node.")
             return
-        title = simpledialog.askstring("Add Recipe", "Enter Recipe Title:")
-        if not title:
-            return
-        ingredients = simpledialog.askstring("Add Recipe", "Enter Ingredients:")
-        instructions = simpledialog.askstring("Add Recipe", "Enter Instructions:")
-        if ingredients is None or instructions is None:
-            return
-        new_recipe = {
-            "title": title,
-            "category": category,
-            "ingredients": ingredients,
-            "instructions": instructions
-        }
-        self.data["recipes"].append(new_recipe)
-        self.save_data()
-        self.populate_tree()
-        messagebox.showinfo("Success", f"Recipe '{title}' added under '{category}'.")
+
+        dialog = RecipeDialog(self.master)
+        if dialog.result:
+            title, ingredients, instructions = dialog.result
+            new_recipe = {
+                "title": title,
+                "category": category,
+                "ingredients": ingredients,
+                "instructions": instructions
+            }
+            self.data["recipes"].append(new_recipe)
+            self.save_data()
+            self.populate_tree()
+            messagebox.showinfo("Success", f"Recipe '{title}' added under '{category}'.")
 
 if __name__ == "__main__":
     root = tk.Tk()
