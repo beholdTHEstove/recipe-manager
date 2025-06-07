@@ -174,7 +174,7 @@ class RecipeManagerApp:
         except Exception as e:
             messagebox.showerror("Error", f"Error saving data:\n{e}")
 
-    def populate_tree(self):
+    def populate_tree(self, expanded_categories=None):
         for item in self.tree.get_children():
             self.tree.delete(item)
         for cat in sorted(self.data["categories"]):
@@ -184,6 +184,8 @@ class RecipeManagerApp:
                                  key=lambda r: r["title"]):
                 self.tree.insert(cat_id, tk.END, text=recipe["title"],
                                  values=("recipe", cat))
+        if expanded_categories:
+            self.expand_categories(expanded_categories)
 
     def get_selected_item(self):
         sel = self.tree.selection()
@@ -291,6 +293,7 @@ class RecipeManagerApp:
         if not item_id:
             messagebox.showwarning("Delete", "Please select an item to delete.")
             return
+        expanded = self.get_expanded_categories()
         item = self.tree.item(item_id)
         item_type = item.get("values", [None])[0]
 
@@ -301,7 +304,7 @@ class RecipeManagerApp:
                     self.data["categories"].remove(cat)
                 self.data["recipes"] = [r for r in self.data["recipes"] if r["category"] != cat]
                 self.save_data()
-                self.populate_tree()
+                self.populate_tree(expanded)
                 messagebox.showinfo("Deleted", f"Category '{cat}' and its recipes have been deleted.")
 
         elif item_type == "recipe":
@@ -311,7 +314,7 @@ class RecipeManagerApp:
                 self.data["recipes"] = [r for r in self.data["recipes"]
                                         if not (r["title"] == recipe_title and r["category"] == category)]
                 self.save_data()
-                self.populate_tree()
+                self.populate_tree(expanded)
                 messagebox.showinfo("Deleted", f"Recipe '{recipe_title}' deleted.")
 
     def add_recipe(self):
@@ -330,7 +333,9 @@ class RecipeManagerApp:
             messagebox.showwarning("Add Recipe", "Please select a category node.")
             return
 
+        expanded = self.get_expanded_categories()
         dialog = RecipeDialog(self.master)
+        self.master.wait_window(dialog)
         if dialog.result:
             title, ingredients, instructions = dialog.result
             new_recipe = {
@@ -341,8 +346,20 @@ class RecipeManagerApp:
             }
             self.data["recipes"].append(new_recipe)
             self.save_data()
-            self.populate_tree()
+            self.populate_tree(expanded)
             messagebox.showinfo("Success", f"Recipe '{title}' added under '{category}'.")
+
+    def get_expanded_categories(self):
+        expanded = []
+        for item in self.tree.get_children():
+            if self.tree.item(item, "open"):
+                expanded.append(self.tree.item(item)["text"])
+        return expanded
+
+    def expand_categories(self, categories):
+        for item in self.tree.get_children():
+            if self.tree.item(item)["text"] in categories:
+                self.tree.item(item, open=True)
 
 if __name__ == "__main__":
     root = tk.Tk()
